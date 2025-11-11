@@ -110,10 +110,10 @@ if process_button:
     if not nama or umur == 0:
         st.warning("⚠️ Silakan isi nama dan umur terlebih dahulu.")
     elif not selected_symptoms_list:
-        st.warning("⚠️ Silakan pilih minimal satu gejala.")
+        st.warning("⚠️ Silakan pilih minimal tiga gejala.")
     else:
         # Hitung keyakinan
-        if len(selected_symptoms_list) == 1:
+        if len(selected_symptoms_list) == 3:
             result_mass = knowledge_base[selected_symptoms_list[0]]
         else:
             result_mass = knowledge_base[selected_symptoms_list[0]]
