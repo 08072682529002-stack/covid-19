@@ -62,14 +62,23 @@ def combine_mass(m1, m2):
 
 # Tampilan Header
 st.markdown("""
-<div style='display: flex; align-items: center; gap: 1rem;'>
+<div style='
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #d0d0d0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+'>
     <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/220px-SARS-CoV-2_without_background.png' width='60'>
     <div>
         <h2 style='margin-bottom: 0;'>🦠 Sistem Pakar Diagnosis COVID-19</h2>
-        <p style='margin-top: 0; font-size: 16px;'>Cepat • Akurat • Informatif</p>
+        <p style='margin-top: 5px; font-size: 16px; color: #333;'>Cepat • Akurat • Informatif</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
 
 # Input Data Pengguna
 st.subheader("🧑‍⚕️ Data Pengguna")
