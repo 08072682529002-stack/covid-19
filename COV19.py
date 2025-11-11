@@ -133,11 +133,6 @@ if process_button:
         st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
         st.info(f"🩺 Gejala yang dipilih: {', '.join(gejala_terpilih)}")
 
-# Tombol Reset
-st.markdown("---")
-if st.button("🔄 Reset Form"):
-    st.experimental_rerun()
-
 
 # In[ ]:
 
