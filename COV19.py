@@ -61,14 +61,15 @@ def combine_mass(m1, m2):
     return {h: val / denominator for h, val in new_mass.items()}
 
 # Tampilan Header
-col_logo, col_title = st.columns([1, 5])
-with col_logo:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/220px-SARS-CoV-2_without_background.png", width=80)
-with col_title:
-    st.markdown("""
-    ## 🦠 Sistem Pakar Diagnosis COVID-19  
-    #### Cepat • Akurat • Informatif
-    """)
+st.markdown("""
+<div style='display: flex; align-items: center; gap: 1rem;'>
+    <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/220px-SARS-CoV-2_without_background.png' width='60'>
+    <div>
+        <h2 style='margin-bottom: 0;'>🦠 Sistem Pakar Diagnosis COVID-19</h2>
+        <p style='margin-top: 0; font-size: 16px;'>Cepat • Akurat • Informatif</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Input Data Pengguna
 st.subheader("🧑‍⚕️ Data Pengguna")
@@ -100,9 +101,9 @@ if process_button:
     if not nama or umur == 0:
         st.warning("⚠️ Silakan isi nama dan umur terlebih dahulu.")
     elif not selected_symptoms_list:
-        st.warning("⚠️ Silakan pilih minimal satu gejala.")
+        st.warning("⚠️ Silakan pilih minimal dua gejala.")
     else:
-        if len(selected_symptoms_list) == 1:
+        if len(selected_symptoms_list) == 2:
             result_mass = knowledge_base[selected_symptoms_list[0]]
         else:
             result_mass = knowledge_base[selected_symptoms_list[0]]
