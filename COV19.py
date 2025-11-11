@@ -138,6 +138,36 @@ if process_button:
         else:
             kesimpulan = "🔴 Tidak Cukup Bukti untuk terdiagnosis COVID-19."
             st.error(kesimpulan)
+            
+# Saran Kesehatan Berdasarkan Diagnosis
+st.markdown("### 🩺 Saran Kesehatan")
+
+if belief_covid > 0.8:
+    st.info("""
+    ✅ **Saran:**  
+    - Segera lakukan tes PCR atau antigen di fasilitas kesehatan terdekat  
+    - Isolasi mandiri minimal 5–7 hari  
+    - Gunakan masker dan hindari kontak dengan orang lain  
+    - Konsumsi makanan bergizi dan cukup istirahat  
+    - Hubungi tenaga medis jika muncul gejala berat seperti sesak napas
+    """)
+elif belief_covid > 0.5:
+    st.info("""
+    ⚠️ **Saran:**  
+    - Lakukan tes COVID-19 untuk konfirmasi  
+    - Pantau gejala selama beberapa hari  
+    - Gunakan masker saat beraktivitas  
+    - Perbanyak minum air putih dan istirahat cukup  
+    - Konsultasikan ke dokter jika gejala memburuk
+    """)
+else:
+    st.info("""
+    🛡️ **Saran:**  
+    - Tetap jaga protokol kesehatan  
+    - Perkuat imun dengan makanan sehat dan olahraga ringan  
+    - Hindari kerumunan dan gunakan masker di tempat umum  
+    - Jika muncul gejala baru, segera lakukan pemeriksaan
+    """)
 
         st.info(f"🕒 Waktu Diagnosis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
