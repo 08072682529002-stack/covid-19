@@ -169,9 +169,9 @@ else:
     - Jika muncul gejala baru, segera lakukan pemeriksaan
     """)
 
-        st.info(f"🕒 Waktu Diagnosis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
-        st.info(f"🩺 Gejala yang dipilih: {', '.join(gejala_terpilih)}")
+    st.info(f"🕒 Waktu Diagnosis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
+    st.info(f"🩺 Gejala yang dipilih: {', '.join(gejala_terpilih)}")
 
 
 # In[ ]:
