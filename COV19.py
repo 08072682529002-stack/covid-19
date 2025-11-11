@@ -4,8 +4,6 @@
 # In[1]:
 
 import streamlit as st
-import pandas as pd
-import os
 from datetime import datetime
 
 # Konfigurasi halaman
@@ -62,19 +60,6 @@ def combine_mass(m1, m2):
     denominator = 1 - conflict_k
     return {h: val / denominator for h, val in new_mass.items()}
 
-# Fungsi Simpan Riwayat
-def save_history(nama, umur, gejala, belief_covid, belief_theta, kesimpulan):
-    df = pd.DataFrame([{
-        "Waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "Nama": nama,
-        "Umur": umur,
-        "Gejala": ', '.join(gejala),
-        "Belief COVID-19": f"{belief_covid:.2f}",
-        "Theta": f"{belief_theta:.2f}",
-        "Kesimpulan": kesimpulan
-    }])
-    df.to_csv("riwayat_diagnosis.csv", mode="a", header=False, index=False, encoding="utf-8")
-
 # Tampilan Header
 col_logo, col_title = st.columns([1, 5])
 with col_logo:
@@ -82,7 +67,7 @@ with col_logo:
 with col_title:
     st.markdown("""
     ## 🦠 Sistem Pakar Diagnosis COVID-19  
-    #### Metode Dempster-Shafer | Cepat • Akurat • Informatif
+    #### Cepat • Akurat • Informatif
     """)
 
 # Input Data Pengguna
@@ -144,17 +129,9 @@ if process_button:
             kesimpulan = "🔴 Tidak Cukup Bukti untuk terdiagnosis COVID-19."
             st.error(kesimpulan)
 
-        save_history(nama, umur, gejala_terpilih, belief_covid, belief_theta, kesimpulan)
-
-# Tampilkan Riwayat
-st.markdown("---")
-if st.button("📜 Lihat Riwayat Diagnosis"):
-    if os.path.exists("riwayat_diagnosis.csv"):
-        df = pd.read_csv("riwayat_diagnosis.csv", header=None, encoding="utf-8")
-        df.columns = ["Waktu", "Nama", "Umur", "Gejala", "Belief COVID-19", "Theta", "Kesimpulan"]
-        st.dataframe(df, height=300)
-    else:
-        st.info("Belum ada riwayat diagnosis yang tersimpan.")
+        st.info(f"🕒 Waktu Diagnosis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
+        st.info(f"🩺 Gejala yang dipilih: {', '.join(gejala_terpilih)}")
 
 # Tombol Reset
 st.markdown("---")
