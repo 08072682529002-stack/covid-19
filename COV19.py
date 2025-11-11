@@ -110,9 +110,10 @@ if process_button:
     if not nama or umur == 0:
         st.warning("⚠️ Silakan isi nama dan umur terlebih dahulu.")
     elif not selected_symptoms_list:
-        st.warning("⚠️ Silakan pilih minimal dua gejala.")
+        st.warning("⚠️ Silakan pilih minimal satu gejala.")
     else:
-        if len(selected_symptoms_list) == 2:
+        # Hitung keyakinan
+        if len(selected_symptoms_list) == 1:
             result_mass = knowledge_base[selected_symptoms_list[0]]
         else:
             result_mass = knowledge_base[selected_symptoms_list[0]]
@@ -123,6 +124,7 @@ if process_button:
         belief_covid = result_mass.get('COVID-19', 0)
         belief_theta = result_mass.get('theta', 0)
 
+        # Tampilkan hasil
         st.markdown("### 📊 Hasil Diagnosis")
         st.metric("🧪 Keyakinan COVID-19", f"{belief_covid * 100:.2f}%")
         st.progress(belief_covid)
@@ -138,39 +140,40 @@ if process_button:
         else:
             kesimpulan = "🔴 Tidak Cukup Bukti untuk terdiagnosis COVID-19."
             st.error(kesimpulan)
-            st.info(f"🕒 Waktu Diagnosis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
-            st.info(f"🩺 Gejala yang dipilih: {', '.join(gejala_terpilih)}")
 
-# Saran Kesehatan Berdasarkan Diagnosis
-st.markdown("### 🩺 Saran Kesehatan")
+        # Detail tambahan
+        st.markdown("### 🧾 Detail Diagnosis")
+        st.info(f"🕒 Waktu: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        st.info(f"👤 Nama: {nama} | Umur: {umur} tahun")
+        st.info(f"🩺 Gejala: {', '.join(gejala_terpilih)}")
 
-if belief_covid > 0.8:
-    st.info("""
-    ✅ **Saran:**  
-    - Segera lakukan tes PCR atau antigen di fasilitas kesehatan terdekat  
-    - Isolasi mandiri minimal 5–7 hari  
-    - Gunakan masker dan hindari kontak dengan orang lain  
-    - Konsumsi makanan bergizi dan cukup istirahat  
-    - Hubungi tenaga medis jika muncul gejala berat seperti sesak napas
-    """)
-elif belief_covid > 0.5:
-    st.info("""
-    ⚠️ **Saran:**  
-    - Lakukan tes COVID-19 untuk konfirmasi  
-    - Pantau gejala selama beberapa hari  
-    - Gunakan masker saat beraktivitas  
-    - Perbanyak minum air putih dan istirahat cukup  
-    - Konsultasikan ke dokter jika gejala memburuk
-    """)
-else:
-    st.info("""
-    🛡️ **Saran:**  
-    - Tetap jaga protokol kesehatan  
-    - Perkuat imun dengan makanan sehat dan olahraga ringan  
-    - Hindari kerumunan dan gunakan masker di tempat umum  
-    - Jika muncul gejala baru, segera lakukan pemeriksaan
-    """)
+        # Saran Kesehatan
+        st.markdown("### 🩺 Saran Kesehatan")
+        if belief_covid > 0.8:
+            st.info("""
+            ✅ **Saran:**  
+            - Tes PCR/antigen segera  
+            - Isolasi mandiri 5–7 hari  
+            - Konsumsi makanan bergizi  
+            - Hubungi tenaga medis jika gejala berat
+            """)
+        elif belief_covid > 0.5:
+            st.info("""
+            ⚠️ **Saran:**  
+            - Lakukan tes COVID-19 untuk konfirmasi  
+            - Pantau gejala selama 3 hari  
+            - Gunakan masker saat beraktivitas  
+            - Istirahat cukup dan minum air putih
+            """)
+        else:
+            st.info("""
+            🛡️ **Saran:**  
+            - Tetap jaga protokol kesehatan  
+            - Perkuat imun dengan makanan sehat  
+            - Hindari kerumunan  
+            - Lakukan pemeriksaan jika muncul gejala baru
+            """)
+
 
 
 # In[ ]:
