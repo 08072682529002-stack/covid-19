@@ -1,0 +1,150 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import streamlit as st
+import pandas as pd
+import os
+from datetime import datetime
+
+# Konfigurasi halaman
+st.set_page_config(page_title="Diagnosis COVID-19", page_icon="🦠", layout="wide")
+
+# Basis Pengetahuan
+knowledge_base = {
+    'Kondisi Tubuh': {'COVID-19': 0.8, 'theta': 0.2},
+    'Batuk': {'COVID-19': 0.7, 'theta': 0.3},
+    'Lelah': {'COVID-19': 0.6, 'theta': 0.4},
+    'Napas': {'COVID-19': 0.9, 'theta': 0.1},
+    'Tenggorokan': {'COVID-19': 0.5, 'theta': 0.5},
+    'Otot': {'COVID-19': 0.4, 'theta': 0.6},
+    'Kepala': {'COVID-19': 0.3, 'theta': 0.7},
+    'Pengecapan': {'COVID-19': 0.9, 'theta': 0.1},
+    'Penciuman': {'COVID-19': 0.9, 'theta': 0.1},
+    'Diare': {'COVID-19': 0.2, 'theta': 0.8},
+}
+
+symptom_names = {
+    'Kondisi Tubuh': 'Demam',
+    'Batuk': 'Batuk Kering',
+    'Lelah': 'Kelelahan',
+    'Napas': 'Sesak Napas',
+    'Tenggorokan': 'Sakit Tenggorokan',
+    'Otot': 'Nyeri Otot',
+    'Kepala': 'Sakit Kepala',
+    'Pengecapan': 'Hilang Pengecapan',
+    'Penciuman': 'Hilang Penciuman',
+    'Diare': 'Diare',
+}
+
+possible_hypotheses = set(['COVID-19', 'theta'])
+
+# Fungsi Dempster-Shafer
+def combine_mass(m1, m2):
+    new_mass = {}
+    conflict_k = 0
+    for h1_str, val1 in m1.items():
+        for h2_str, val2 in m2.items():
+            h1 = set(h1_str.split(',')) if h1_str != 'theta' else possible_hypotheses
+            h2 = set(h2_str.split(',')) if h2_str != 'theta' else possible_hypotheses
+            intersection = h1.intersection(h2)
+            if not intersection:
+                conflict_k += val1 * val2
+                continue
+            new_h_str = ','.join(sorted(list(intersection)))
+            if new_h_str == 'COVID-19,theta':
+                new_h_str = 'theta'
+            new_mass[new_h_str] = new_mass.get(new_h_str, 0) + (val1 * val2)
+    if conflict_k == 1:
+        st.error("❌ Terjadi konflik total antar bukti.")
+        return {'theta': 1.0}
+    denominator = 1 - conflict_k
+    return {h: val / denominator for h, val in new_mass.items()}
+
+# Fungsi Simpan Riwayat
+def save_history(gejala, belief_covid, belief_theta, kesimpulan):
+    df = pd.DataFrame([{
+        "Waktu": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Gejala": ', '.join(gejala),
+        "Belief COVID-19": f"{belief_covid:.2f}",
+        "Theta": f"{belief_theta:.2f}",
+        "Kesimpulan": kesimpulan
+    }])
+    df.to_csv("riwayat_diagnosis.csv", mode="a", header=False, index=False, encoding="utf-8")
+
+# Tampilan UI
+st.title("🦠 Sistem Pakar Diagnosis COVID-19")
+st.caption("🔍 Metode Dempster-Shafer | Interaktif & Informatif")
+
+st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/220px-SARS-CoV-2_without_background.png", width=150)
+
+st.subheader("🩺 Pilih Gejala yang Kamu Alami")
+selected_symptoms_map = {}
+col1, col2 = st.columns(2)
+items = list(symptom_names.items())
+for i in range(0, len(items), 2):
+    code1, name1 = items[i]
+    with col1:
+        selected_symptoms_map[code1] = st.checkbox(f"{name1}")
+    if i + 1 < len(items):
+        code2, name2 = items[i + 1]
+        with col2:
+            selected_symptoms_map[code2] = st.checkbox(f"{name2}")
+
+st.markdown("---")
+process_button = st.button("🚀 Proses Diagnosis")
+
+if process_button:
+    selected_symptoms_list = [code for code, selected in selected_symptoms_map.items() if selected]
+    gejala_terpilih = [symptom_names[c] for c in selected_symptoms_list]
+
+    if not selected_symptoms_list:
+        st.warning("⚠️ Silakan pilih minimal satu gejala.")
+    else:
+        if len(selected_symptoms_list) == 1:
+            result_mass = knowledge_base[selected_symptoms_list[0]]
+        else:
+            result_mass = knowledge_base[selected_symptoms_list[0]]
+            for i in range(1, len(selected_symptoms_list)):
+                m2 = knowledge_base[selected_symptoms_list[i]]
+                result_mass = combine_mass(result_mass, m2)
+
+        belief_covid = result_mass.get('COVID-19', 0)
+        belief_theta = result_mass.get('theta', 0)
+
+        st.markdown("### 📊 Hasil Diagnosis")
+        st.metric("Tingkat Keyakinan COVID-19", f"{belief_covid * 100:.2f}%")
+        st.progress(belief_covid)
+        st.metric("Tingkat Ketidaktahuan (Theta)", f"{belief_theta * 100:.2f}%")
+        st.progress(belief_theta)
+
+        if belief_covid > 0.8:
+            kesimpulan = "🟢 Sangat Yakin terdiagnosis COVID-19."
+            st.success(kesimpulan)
+        elif belief_covid > 0.5:
+            kesimpulan = "🟡 Cukup Yakin terdiagnosis COVID-19."
+            st.warning(kesimpulan)
+        else:
+            kesimpulan = "🔴 Tidak Cukup Bukti untuk terdiagnosis COVID-19."
+            st.error(kesimpulan)
+
+        save_history(gejala_terpilih, belief_covid, belief_theta, kesimpulan)
+
+# Tampilkan Riwayat
+st.markdown("---")
+if st.button("📜 Lihat Riwayat Diagnosis"):
+    if os.path.exists("riwayat_diagnosis.csv"):
+        df = pd.read_csv("riwayat_diagnosis.csv", header=None, encoding="utf-8")
+        df.columns = ["Waktu", "Gejala", "Belief COVID-19", "Theta", "Kesimpulan"]
+        st.dataframe(df)
+    else:
+        st.info("Belum ada riwayat diagnosis yang tersimpan.")
+
+
+# In[ ]:
+
+
+
+
